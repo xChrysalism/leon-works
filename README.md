@@ -25,6 +25,13 @@ Die Konfiguration erzeugt einen statischen Export im Ordner `out/`. Dadurch kann
 die Seite kostenlos auf statischem Hosting wie Cloudflare Pages oder GitHub
 Pages veröffentlicht werden.
 
+Für eine lokale Vorschau des statischen Exports kann zum Beispiel ein
+statischer Server verwendet werden:
+
+```bash
+npx serve out
+```
+
 ### Kostenlose Veröffentlichung mit Cloudflare Pages
 
 1. Ein Cloudflare-Konto anlegen und das GitHub-Repository verbinden oder den

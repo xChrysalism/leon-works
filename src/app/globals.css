@@ -23,12 +23,11 @@ body {
 
 @layer components {
   .glass-panel {
+    position: relative;
     color: var(--lg-text);
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow:
-      0 32px 100px rgba(0, 0, 0, 0.36),
-      0 0 30px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 32px 100px rgba(0, 0, 0, 0.36), 0 0 30px rgba(0, 0, 0, 0.16);
     isolation: isolate;
     overflow: hidden;
     transition: transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.2);
@@ -78,15 +77,11 @@ body {
   }
 
   .glass-card {
-    background:
-      linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)),
-      rgba(20, 35, 58, 0.26);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06)), rgba(20, 35, 58, 0.26);
     backdrop-filter: blur(26px) saturate(165%);
     -webkit-backdrop-filter: blur(26px) saturate(165%);
     border: 1px solid rgba(255, 255, 255, 0.13);
-    box-shadow:
-      0 12px 32px rgba(0, 0, 0, 0.16),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 
   .glass-button,
@@ -163,9 +158,26 @@ body {
     box-shadow: 0 0 45px rgba(56, 189, 248, 0.18);
   }
 
-  .ambient-orb {
+  .liquid-scene {
+    overflow: hidden;
+    background: #06101f;
+  }
+
+  .liquid-defs {
+    position: absolute;
+    height: 0;
+    width: 0;
+    overflow: hidden;
+  }
+
+  .ambient-orb,
+  .liquid-highlight {
     position: absolute;
     border-radius: 999px;
+    pointer-events: none;
+  }
+
+  .ambient-orb {
     filter: blur(80px);
     opacity: 0.24;
   }
@@ -186,26 +198,11 @@ body {
     background: #0e7490;
   }
 
-  .liquid-scene {
-    overflow: hidden;
-    background: #06101f;
-  }
-
-  .liquid-defs {
-    position: absolute;
-    height: 0;
-    width: 0;
-    overflow: hidden;
-  }
-
   .liquid-highlight {
-    position: absolute;
     height: 24rem;
     width: 24rem;
-    border-radius: 999px;
     filter: blur(55px);
     opacity: 0.2;
-    pointer-events: none;
     transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
@@ -225,9 +222,7 @@ body {
   }
 
   .hero-widget {
-    background:
-      radial-gradient(circle at 90% 10%, rgba(125, 211, 252, 0.2), transparent 32%),
-      linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.045));
+    background: radial-gradient(circle at 90% 10%, rgba(125, 211, 252, 0.2), transparent 32%), linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.045));
   }
 
   .hero-widget::before {
@@ -261,42 +256,42 @@ html {
   .text-balance {
     text-wrap: balance;
   }
+}
 
-  @keyframes liquid-drift {
-    from {
-      transform: translate3d(-10px, 8px, 0) scale(0.95);
-    }
+@keyframes liquid-drift {
+  from {
+    transform: translate3d(-10px, 8px, 0) scale(0.95);
+  }
+  to {
+    transform: translate3d(24px, -18px, 0) scale(1.08);
+  }
+}
 
-    @keyframes liquid-pulse {
-      from {
-        opacity: 0.14;
-        transform: translate(-50%, -50%) scale(0.86);
-      }
-      to {
-        opacity: 0.28;
-        transform: translate(-50%, -50%) scale(1.08);
-      }
-    }
+@keyframes liquid-pulse {
+  from {
+    opacity: 0.14;
+    transform: translate(-50%, -50%) scale(0.86);
+  }
+  to {
+    opacity: 0.28;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
 
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        scroll-behavior: auto !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
-    @supports not (backdrop-filter: blur(1px)) {
-      .glass-filter {
-        background: rgba(16, 31, 54, 0.88);
-      }
-    }
-    to {
-      transform: translate3d(24px, -18px, 0) scale(1.08);
-    }
+@supports not (backdrop-filter: blur(1px)) {
+  .glass-filter {
+    background: rgba(16, 31, 54, 0.88);
   }
 }
 
