@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 interface CalendarEvent {
   id: string;
@@ -153,6 +153,8 @@ function EventMeta({ event }: { event: CalendarEvent }) {
 }
 
 export default function Home() {
+  const rootRef = useRef<HTMLElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [now, setNow] = useState(() => new Date());
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -180,6 +182,54 @@ export default function Home() {
       window.clearInterval(refresh);
     };
   }, [loadCalendar]);
+
+  useEffect(() => {
+    let destroyLiquidGlass: (() => void) | undefined;
+    let cancelled = false;
+
+    async function initializeLiquidGlass() {
+      if (!rootRef.current || !panelRef.current) return;
+
+      try {
+        const { LiquidGlass } = await import("@ybouane/liquidglass");
+        const instance = await LiquidGlass.init({
+          root: rootRef.current,
+          glassElements: [panelRef.current],
+          defaults: {
+            blurAmount: 0.16,
+            refraction: 0.72,
+            chromAberration: 0.035,
+            edgeHighlight: 0.16,
+            specular: 0.12,
+            fresnel: 0.8,
+            cornerRadius: 32,
+            zRadius: 24,
+            opacity: 0.9,
+            saturation: 0.1,
+            tintStrength: 0.14,
+            brightness: 0.03,
+            shadowOpacity: 0.36,
+            shadowSpread: 16,
+            shadowOffsetY: 8,
+          },
+        });
+
+        if (cancelled) {
+          instance.destroy();
+        } else {
+          destroyLiquidGlass = () => instance.destroy();
+        }
+      } catch (error) {
+        console.warn("LiquidGlass konnte nicht initialisiert werden:", error);
+      }
+    }
+
+    void initializeLiquidGlass();
+    return () => {
+      cancelled = true;
+      destroyLiquidGlass?.();
+    };
+  }, []);
 
   const weekDays = useMemo(() => getWeekDays(now), [now]);
   const weekEvents = useMemo(
@@ -218,7 +268,7 @@ export default function Home() {
     : 0;
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#06101f] text-white">
+    <main ref={rootRef} className="relative min-h-screen overflow-hidden bg-[#06101f] text-white">
       <div className="pointer-events-none fixed inset-0 z-0">
         <img
           src="/background.jpg"
@@ -230,8 +280,28 @@ export default function Home() {
         <div className="ambient-orb ambient-orb-two" />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl items-center px-4 py-6 sm:px-8 lg:px-12">
-        <section className="glass-panel w-full overflow-hidden rounded-[2rem] p-4 sm:p-6 lg:p-8">
+      <section
+        ref={panelRef}
+        className="glass-panel relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col overflow-hidden rounded-[2rem] p-4 sm:min-h-0 sm:my-6 sm:p-6 lg:my-10 lg:p-8"
+        data-config={JSON.stringify({
+          blurAmount: 0.16,
+          refraction: 0.72,
+          chromAberration: 0.035,
+          edgeHighlight: 0.16,
+          specular: 0.12,
+          fresnel: 0.8,
+          cornerRadius: 32,
+          zRadius: 24,
+          opacity: 0.9,
+          saturation: 0.1,
+          tintStrength: 0.14,
+          brightness: 0.03,
+          shadowOpacity: 0.36,
+          shadowSpread: 16,
+          shadowOffsetY: 8,
+        })}
+      >
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-0 sm:px-2 lg:px-4">
           <header className="flex flex-wrap items-start justify-between gap-5 border-b border-white/10 pb-6">
             <div>
               <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.24em] text-sky-200/65">
@@ -444,8 +514,8 @@ export default function Home() {
                 : "Kalender wird synchronisiert …"}
             </span>
           </footer>
-        </section>
-      </div>
+        </div>
+      </section>
     </main>
   );
 }
