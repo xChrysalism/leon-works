@@ -159,6 +159,7 @@ export default function Home() {
   const [now, setNow] = useState(() => new Date());
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
+  const [liquidGlassReady, setLiquidGlassReady] = useState(false);
 
   const loadCalendar = useCallback(async () => {
     try {
@@ -217,6 +218,7 @@ export default function Home() {
         if (cancelled) {
           instance.destroy();
         } else {
+          setLiquidGlassReady(true);
           destroyLiquidGlass = () => instance.destroy();
         }
       } catch (error) {
@@ -227,6 +229,7 @@ export default function Home() {
     void initializeLiquidGlass();
     return () => {
       cancelled = true;
+      setLiquidGlassReady(false);
       destroyLiquidGlass?.();
     };
   }, []);
@@ -268,7 +271,12 @@ export default function Home() {
     : 0;
 
   return (
-    <main ref={rootRef} className="relative min-h-screen overflow-hidden bg-[#06101f] text-white">
+    <main
+      ref={rootRef}
+      className={`liquid-root relative min-h-screen bg-[#06101f] text-white ${
+        liquidGlassReady ? "liquid-glass-ready" : ""
+      }`}
+    >
       <div className="pointer-events-none fixed inset-0 z-0">
         <img
           src="/background.jpg"
@@ -282,7 +290,7 @@ export default function Home() {
 
       <section
         ref={panelRef}
-        className="glass-panel relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col overflow-hidden rounded-[2rem] p-4 sm:min-h-0 sm:my-6 sm:p-6 lg:my-10 lg:p-8"
+        className="glass-panel relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col rounded-[2rem] p-4 sm:min-h-0 sm:my-6 sm:p-6 lg:my-10 lg:p-8"
         data-config={JSON.stringify({
           blurAmount: 0.16,
           refraction: 0.72,

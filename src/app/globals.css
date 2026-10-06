@@ -34,6 +34,12 @@ body {
       inset 0 -1px 0 rgba(255, 255, 255, 0.06);
   }
 
+  .liquid-glass-ready .glass-panel {
+    background: rgba(7, 19, 37, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+  }
+
   .glass-card {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.045));
     backdrop-filter: blur(26px) saturate(165%);
