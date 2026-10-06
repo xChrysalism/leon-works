@@ -2,7 +2,9 @@
 
 Ein responsives Studien-Dashboard im Apple-inspirierten Liquid-Glass-Stil. Der
 Stundenplan wird aus `public/schedule.ics` geladen und im Browser als aktueller
-und nächster Termin dargestellt.
+und nächster Termin dargestellt. Die Hauptplatte nutzt zusätzlich
+`@ybouane/liquidglass` für echte WebGL-Refraction, Blur und Bevel-Highlights;
+bei Browsern ohne WebGL bleibt das CSS-Glass-Design als Fallback erhalten.
 
 ## Lokal starten
 
