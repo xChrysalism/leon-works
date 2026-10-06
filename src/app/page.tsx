@@ -23,6 +23,39 @@ const CATEGORY_STYLES: Record<string, { className: string; icon: string }> = {
 
 const DAY_LABELS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
+const DOCK_APPS = [
+  {
+    name: "Finder",
+    image:
+      "https://raw.githubusercontent.com/lucasromerodb/liquid-glass-effect-macos/refs/heads/main/assets/finder.png",
+  },
+  {
+    name: "Karten",
+    image:
+      "https://raw.githubusercontent.com/lucasromerodb/liquid-glass-effect-macos/refs/heads/main/assets/map.png",
+  },
+  {
+    name: "Nachrichten",
+    image:
+      "https://raw.githubusercontent.com/lucasromerodb/liquid-glass-effect-macos/refs/heads/main/assets/messages.png",
+  },
+  {
+    name: "Notizen",
+    image:
+      "https://raw.githubusercontent.com/lucasromerodb/liquid-glass-effect-macos/refs/heads/main/assets/notes.png",
+  },
+  {
+    name: "Safari",
+    image:
+      "https://raw.githubusercontent.com/lucasromerodb/liquid-glass-effect-macos/refs/heads/main/assets/safari.png",
+  },
+  {
+    name: "Bücher",
+    image:
+      "https://raw.githubusercontent.com/lucasromerodb/liquid-glass-effect-macos/refs/heads/main/assets/books.png",
+  },
+];
+
 function unfoldIcs(text: string) {
   return text.replace(/\r?\n[ \t]/g, "").replace(/\r/g, "");
 }
@@ -477,6 +510,35 @@ export default function Home() {
               </div>
             </article>
           </div>
+
+          <section className="liquid-dock-wrapper mt-4" aria-label="Apps">
+            <div className="liquid-dock-effect" />
+            <div className="liquid-dock-tint" />
+            <div className="liquid-dock-shine" />
+            <div className="liquid-dock-content">
+              <div className="mb-4 flex items-center justify-between px-1">
+                <div>
+                  <p className="eyebrow">Dein Dock</p>
+                  <h2 className="mt-2 text-xl font-semibold">Apps</h2>
+                </div>
+                <span className="text-xs text-white/40">Platzhalter</span>
+              </div>
+              <div className="liquid-dock">
+                {DOCK_APPS.map((app) => (
+                  <button
+                    key={app.name}
+                    type="button"
+                    className="dock-app"
+                    title={`${app.name} ist ein Platzhalter`}
+                    aria-label={`${app.name} öffnen`}
+                  >
+                    <img src={app.image} alt="" />
+                    <span>{app.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
 
           <footer className="mt-6 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-5 text-xs text-white/35">
             <span>Liquid Study Space</span>
