@@ -154,13 +154,10 @@ function EventMeta({ event }: { event: CalendarEvent }) {
 
 export default function Home() {
   const rootRef = useRef<HTMLElement>(null);
-  const panelRef = useRef<HTMLElement>(null);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [now, setNow] = useState(() => new Date());
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
-  const [liquidGlassReady, setLiquidGlassReady] = useState(false);
-  const [pointer, setPointer] = useState({ x: 50, y: 35 });
 
   const loadCalendar = useCallback(async () => {
     try {
@@ -186,65 +183,31 @@ export default function Home() {
   }, [loadCalendar]);
 
   useEffect(() => {
-    let destroyLiquidGlass: (() => void) | undefined;
-    let cancelled = false;
+    let frame = 0;
+    let targetX = 50;
+    let targetY = 40;
+    let currentX = targetX;
+    let currentY = targetY;
 
-    async function initializeLiquidGlass() {
-      if (!rootRef.current || !panelRef.current) return;
-
-      try {
-        const { LiquidGlass } = await import("@ybouane/liquidglass");
-        const instance = await LiquidGlass.init({
-          root: rootRef.current,
-          glassElements: [panelRef.current],
-          defaults: {
-            blurAmount: 0.16,
-            refraction: 0.72,
-            chromAberration: 0.035,
-            edgeHighlight: 0.16,
-            specular: 0.12,
-            fresnel: 0.8,
-            cornerRadius: 32,
-            zRadius: 24,
-            opacity: 0.9,
-            saturation: 0.1,
-            tintStrength: 0.14,
-            brightness: 0.03,
-            shadowOpacity: 0.36,
-            shadowSpread: 16,
-            shadowOffsetY: 8,
-          },
-        });
-
-        if (cancelled) {
-          instance.destroy();
-        } else {
-          setLiquidGlassReady(true);
-          destroyLiquidGlass = () => instance.destroy();
-        }
-      } catch (error) {
-        console.warn("LiquidGlass konnte nicht initialisiert werden:", error);
-      }
-    }
-
-    void initializeLiquidGlass();
-    return () => {
-      cancelled = true;
-      setLiquidGlassReady(false);
-      destroyLiquidGlass?.();
-    };
-  }, []);
-
-  useEffect(() => {
     const handlePointerMove = (event: PointerEvent) => {
-      setPointer({
-        x: (event.clientX / window.innerWidth) * 100,
-        y: (event.clientY / window.innerHeight) * 100,
-      });
+      targetX = (event.clientX / window.innerWidth) * 100;
+      targetY = (event.clientY / window.innerHeight) * 100;
     };
 
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
-    return () => window.removeEventListener("pointermove", handlePointerMove);
+    const animate = () => {
+      currentX += (targetX - currentX) * 0.06;
+      currentY += (targetY - currentY) * 0.06;
+      rootRef.current?.style.setProperty("--pointer-x", `${currentX}%`);
+      rootRef.current?.style.setProperty("--pointer-y", `${currentY}%`);
+      frame = window.requestAnimationFrame(animate);
+    };
+    frame = window.requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const weekDays = useMemo(() => getWeekDays(now), [now]);
@@ -284,22 +247,16 @@ export default function Home() {
     : 0;
 
   return (
-    <main
-      ref={rootRef}
-      className={`liquid-root relative min-h-screen bg-[#06101f] text-white ${
-        liquidGlassReady ? "liquid-glass-ready" : ""
-      }`}
-    >
-      <div
-        className="liquid-scene pointer-events-none fixed inset-0 z-0"
-        data-dynamic
-        style={
-          {
-            "--pointer-x": `${pointer.x}%`,
-            "--pointer-y": `${pointer.y}%`,
-          } as React.CSSProperties
-        }
-      >
+    <main ref={rootRef} className="liquid-root relative min-h-screen bg-[#06101f] text-white">
+      <svg className="liquid-defs" aria-hidden="true">
+        <filter id="liquid-distortion" x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="7" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="18" xChannelSelector="R" yChannelSelector="G" />
+          <feGaussianBlur stdDeviation="0.7" />
+        </filter>
+      </svg>
+
+      <div className="liquid-scene pointer-events-none fixed inset-0 z-0">
         <img
           src="/background.jpg"
           alt=""
@@ -312,28 +269,11 @@ export default function Home() {
         <div className="liquid-highlight liquid-highlight-two" />
       </div>
 
-      <section
-        ref={panelRef}
-        className="glass-panel relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col rounded-[2rem] p-4 sm:min-h-0 sm:my-6 sm:p-6 lg:my-10 lg:p-8"
-        data-config={JSON.stringify({
-          blurAmount: 0.16,
-          refraction: 0.72,
-          chromAberration: 0.035,
-          edgeHighlight: 0.16,
-          specular: 0.12,
-          fresnel: 0.8,
-          cornerRadius: 32,
-          zRadius: 24,
-          opacity: 0.9,
-          saturation: 0.1,
-          tintStrength: 0.14,
-          brightness: 0.03,
-          shadowOpacity: 0.36,
-          shadowSpread: 16,
-          shadowOffsetY: 8,
-        })}
-      >
-        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-0 sm:px-2 lg:px-4">
+      <section className="glass-panel relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col rounded-[2rem] p-4 sm:min-h-0 sm:my-6 sm:p-6 lg:my-10 lg:p-8">
+        <div className="glass-filter" />
+        <div className="glass-overlay" />
+        <div className="glass-specular" />
+        <div className="glass-content mx-auto flex w-full max-w-7xl flex-1 flex-col px-0 sm:px-2 lg:px-4">
           <header className="flex flex-wrap items-start justify-between gap-5 border-b border-white/10 pb-6">
             <div>
               <div className="mb-3 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.24em] text-sky-200/65">
