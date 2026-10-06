@@ -147,6 +147,35 @@ body {
     background: #0e7490;
   }
 
+  .liquid-scene {
+    contain: paint;
+  }
+
+  .liquid-highlight {
+    position: absolute;
+    height: 24rem;
+    width: 24rem;
+    border-radius: 999px;
+    filter: blur(55px);
+    opacity: 0.2;
+    pointer-events: none;
+    transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .liquid-highlight-one {
+    left: var(--pointer-x);
+    top: var(--pointer-y);
+    background: #bae6fd;
+    transform: translate(-50%, -50%);
+  }
+
+  .liquid-highlight-two {
+    right: 12%;
+    bottom: 4%;
+    background: #22d3ee;
+    animation: liquid-drift 9s ease-in-out infinite alternate;
+  }
+
   .hero-widget {
     background:
       radial-gradient(circle at 90% 10%, rgba(125, 211, 252, 0.2), transparent 32%),
@@ -183,6 +212,15 @@ html {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  @keyframes liquid-drift {
+    from {
+      transform: translate3d(-10px, 8px, 0) scale(0.95);
+    }
+    to {
+      transform: translate3d(24px, -18px, 0) scale(1.08);
+    }
   }
 }
 

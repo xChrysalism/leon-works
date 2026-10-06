@@ -160,6 +160,7 @@ export default function Home() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const [liquidGlassReady, setLiquidGlassReady] = useState(false);
+  const [pointer, setPointer] = useState({ x: 50, y: 35 });
 
   const loadCalendar = useCallback(async () => {
     try {
@@ -234,6 +235,18 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const handlePointerMove = (event: PointerEvent) => {
+      setPointer({
+        x: (event.clientX / window.innerWidth) * 100,
+        y: (event.clientY / window.innerHeight) * 100,
+      });
+    };
+
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    return () => window.removeEventListener("pointermove", handlePointerMove);
+  }, []);
+
   const weekDays = useMemo(() => getWeekDays(now), [now]);
   const weekEvents = useMemo(
     () => {
@@ -277,7 +290,16 @@ export default function Home() {
         liquidGlassReady ? "liquid-glass-ready" : ""
       }`}
     >
-      <div className="pointer-events-none fixed inset-0 z-0">
+      <div
+        className="liquid-scene pointer-events-none fixed inset-0 z-0"
+        data-dynamic
+        style={
+          {
+            "--pointer-x": `${pointer.x}%`,
+            "--pointer-y": `${pointer.y}%`,
+          } as React.CSSProperties
+        }
+      >
         <img
           src="/background.jpg"
           alt=""
@@ -286,6 +308,8 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(86,164,255,.28),transparent_34%),linear-gradient(135deg,rgba(2,10,25,.35),rgba(1,5,14,.86))]" />
         <div className="ambient-orb ambient-orb-one" />
         <div className="ambient-orb ambient-orb-two" />
+        <div className="liquid-highlight liquid-highlight-one" />
+        <div className="liquid-highlight liquid-highlight-two" />
       </div>
 
       <section
